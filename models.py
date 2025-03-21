@@ -2,7 +2,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 class URL(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     url = fields.CharField(max_length=255)
     short_url = fields.CharField(max_length=255, unique=True)
     created_at = fields.DatetimeField(auto_now_add=True)
