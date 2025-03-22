@@ -37,15 +37,15 @@ async def short(url: str):
     if not url:
         return JSONResponse(content={"status": "error", "message": "URL is required"}, status_code=400)
     try:
-        short_url = base_url + "/" + generate_short_id()
-        resp = await URL.create(url=url, short_url=short_url)
-        return JSONResponse(content={"status": "success", "data": resp.to_json()}, status_code=201)
+        short_code =generate_short_id()
+        resp = await URL.create(url=url, short_code=short_code)
+        return JSONResponse(content={"status": "success", "data": resp.to_json(base_url)}, status_code=201)
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": "Failed to create short URL"}, status_code=500)
 
-@app.get("/{short_id}",status_code=307)
-async def redirect(short_id: str):
-    url= await URL.filter(short_url=base_url + "/" + short_id)
+@app.get("/{short_code}",status_code=307)
+async def redirect(short_code: str):
+    url= await URL.filter(short_code=short_code)
     if url:
         return RedirectResponse(url=url[0].url)
     return JSONResponse(content={"status": "error", "message": "Invalid short URL"}, status_code=404)
