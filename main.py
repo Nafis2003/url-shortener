@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse,JSONResponse
 import os
 from dotenv import load_dotenv
 from tortoise import Tortoise, fields
@@ -23,11 +23,11 @@ async def lifespan(app):
     yield
     await Tortoise.close_connections()
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(title="URL Shortener",version="1.0.1",description="A URL shortening service",lifespan=lifespan)
 
-@app.get("/")
+@app.get("/",status_code=200)
 async def root():
-    return {"author": "Nafis Sadiq","version": "1.0.0","description": "A URL shortening service","api-docs":f"{base_url}/docs","github": "https://github.com/Nafis2003"}
+    return {"author": "Nafis Sadiq","version": "1.0.1","description": "A URL shortening service","api-docs":f"{base_url}/docs","github": "https://github.com/Nafis2003"}
 
 def generate_short_id():
     uuid_bytes = uuid7().bytes
@@ -35,14 +35,19 @@ def generate_short_id():
 
 @app.post("/short")
 async def short(url: str):
-    short_url = base_url + "/" + generate_short_id()
-    resp = await URL.create(url=url, short_url=short_url)
-    return {"status": "success", "data": resp.to_json()}
+    if not url:
+        return JSONResponse(content={"status": "error", "message": "URL is required"}, status_code=400)
+    try:
+        short_url = base_url + "/" + generate_short_id()
+        resp = await URL.create(url=url, short_url=short_url)
+        return JSONResponse(content={"status": "success", "data": resp.to_json()}, status_code=201)
+    except Exception as e:
+        return JSONResponse(content={"status": "error", "message": "Failed to create short URL"}, status_code=500)
 
 @app.get("/{short_id}")
 async def redirect(short_id: str):
     url= await URL.filter(short_url=base_url + "/" + short_id)
     if url:
         return RedirectResponse(url=url[0].url)
-    return {"status": "error", "message": "URL not found"}
+    return JSONResponse(content={"status": "error", "message": "Invalid short URL"}, status_code=404)
 
