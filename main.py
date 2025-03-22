@@ -27,7 +27,7 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 async def root():
-    return {"author": "Nafis Sadiq","version": "1.0.0","description": "A URL shortening service","github": "https://github.com/Nafis2003"}
+    return {"author": "Nafis Sadiq","version": "1.0.0","description": "A URL shortening service","api-docs":f"{base_url}/docs","github": "https://github.com/Nafis2003"}
 
 def generate_short_id():
     uuid_bytes = uuid7().bytes
