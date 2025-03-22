@@ -43,7 +43,7 @@ async def short(url: str):
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": "Failed to create short URL"}, status_code=500)
 
-@app.get("/{short_id}",status_code=302)
+@app.get("/{short_id}",status_code=307)
 async def redirect(short_id: str):
     url= await URL.filter(short_url=base_url + "/" + short_id)
     if url:
