@@ -2,8 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse,JSONResponse
 import os
 from dotenv import load_dotenv
-from tortoise import Tortoise, fields
-from tortoise.models import Model
+from tortoise import Tortoise
 from contextlib import asynccontextmanager
 from models import URL
 from uuid_extensions import uuid7
@@ -44,7 +43,7 @@ async def short(url: str):
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": "Failed to create short URL"}, status_code=500)
 
-@app.get("/{short_id}")
+@app.get("/{short_id}",status_code=302)
 async def redirect(short_id: str):
     url= await URL.filter(short_url=base_url + "/" + short_id)
     if url:
