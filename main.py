@@ -25,6 +25,10 @@ async def lifespan(app):
 
 app = FastAPI(lifespan=lifespan)
 
+@app.get("/")
+async def root():
+    return {"author": "Nafis Sadiq","version": "1.0.0","description": "A URL shortening service","github": "https://github.com/Nafis2003"}
+
 def generate_short_id():
     uuid_bytes = uuid7().bytes
     return base64.urlsafe_b64encode(uuid_bytes)[:8].decode().rstrip("=")
